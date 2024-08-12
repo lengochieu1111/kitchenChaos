@@ -37,4 +37,20 @@ public class KitchenObject : RyoMonoBehaviour
         return this._kitchenObjectParent;
     }
 
+    public void DestroySelf()
+    {
+        this.GetKitchenObjectParent().ClearKitchenObject();
+
+        Destroy(this.gameObject);
+    }
+
+    public static KitchenObject SpawnKitchenObject(KitchenObjectSO kitchenObjectSO, IKitchenObjectParent kitchenObjectParent)
+    {
+        Transform kitchenObjectTransform = Instantiate(kitchenObjectSO.prefab);
+        KitchenObject kitchenObject = kitchenObjectTransform.GetComponent<KitchenObject>();
+        kitchenObject.SetKitchenObjectParent(kitchenObjectParent);
+
+        return kitchenObject;
+    }
+
 }

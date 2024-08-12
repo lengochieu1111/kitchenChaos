@@ -53,13 +53,24 @@ public class Player : Singleton<Player>, IKitchenObjectParent
         base.Start();
 
         GameInput.Instance.OnInteractAction += Instance_OnInteractAction;
+        GameInput.Instance.OnInteractAlternateAction += Instance_OnInteractAlternateAction;
     }
+
+
 
     private void Instance_OnInteractAction(object sender, System.EventArgs e)
     {
         if (this._selectedCounter != null)
         {
             this._selectedCounter.Interact(this);
+        }
+    }
+
+    private void Instance_OnInteractAlternateAction(object sender, EventArgs e)
+    {
+        if (this._selectedCounter != null)
+        {
+            this._selectedCounter.InteractAlternate(this);
         }
     }
 
@@ -82,7 +93,7 @@ public class Player : Singleton<Player>, IKitchenObjectParent
         if (!canMove)
         {
             Vector3 moveDirX = new Vector3(moveDir.x, 0, 0).normalized;
-            canMove = !Physics.CapsuleCast(this.transform.position, this.transform.position + Vector3.up * this._playerHeight, this._playerRadius, moveDirX, this._moveDistance);
+            canMove = moveDir.x != 0 && !Physics.CapsuleCast(this.transform.position, this.transform.position + Vector3.up * this._playerHeight, this._playerRadius, moveDirX, this._moveDistance);
 
             if (canMove)
             {
@@ -91,7 +102,7 @@ public class Player : Singleton<Player>, IKitchenObjectParent
             else
             {
                 Vector3 moveDirZ = new Vector3(0, 0, moveDir.z).normalized;
-                canMove = !Physics.CapsuleCast(this.transform.position, this.transform.position + Vector3.up * this._playerHeight, this._playerRadius, moveDirZ, this._moveDistance);
+                canMove = moveDir.z != 0 && !Physics.CapsuleCast(this.transform.position, this.transform.position + Vector3.up * this._playerHeight, this._playerRadius, moveDirZ, this._moveDistance);
 
                 if (canMove)
                 {
