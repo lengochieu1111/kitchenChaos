@@ -4,22 +4,26 @@ using UnityEngine;
 
 public class SelectedCounterVisual : RyoMonoBehaviour
 {
-    [SerializeField] private ClearCounter _clearCounter;
-    [SerializeField] private GameObject _virtualGameObject;
+    [SerializeField] private BaseCounter _baseCounter;
+    [SerializeField] private List<GameObject> _virtualGameObjects;
 
 
     protected override void LoadComponents()
     {
         base.LoadComponents();
 
-        if (this._clearCounter == null)
+        if (this._baseCounter == null)
         {
-            this._clearCounter = GetComponentInParent<ClearCounter>();
+            this._baseCounter = GetComponentInParent<BaseCounter>();
         }
 
-        if (this._virtualGameObject == null)
+        if (this._virtualGameObjects.Count <= 0)
         {
-            this._virtualGameObject = this.transform.GetChild(0)?.gameObject;
+            foreach (Transform child in transform)
+            {
+                this._virtualGameObjects.Add(child.gameObject);
+            }
+            
         }
 
     }
@@ -34,7 +38,7 @@ public class SelectedCounterVisual : RyoMonoBehaviour
 
     private void Player_OnSelectedCounterChanged(object sender, Player.OnSelectedCounterChangedEventArgs e)
     {
-        if (e.selectedCounter == this._clearCounter)
+        if (e.selectedCounter == this._baseCounter)
         {
             this.Show();
         }
@@ -46,12 +50,18 @@ public class SelectedCounterVisual : RyoMonoBehaviour
 
     private void Show()
     {
-        this._virtualGameObject.SetActive(true);
+        foreach (GameObject child in this._virtualGameObjects)
+        {
+            child.SetActive(true);
+        }
     }
     
     private void Hiden()
     {
-        this._virtualGameObject.SetActive(false);
+        foreach (GameObject child in this._virtualGameObjects)
+        {
+            child.SetActive(false);
+        }
     }
 
 }

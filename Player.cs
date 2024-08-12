@@ -4,29 +4,42 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Player : Singleton<Player>
+public class Player : Singleton<Player>, IKitchenObjectParent
 {
     public event EventHandler<OnSelectedCounterChangedEventArgs> OnSelectedCounterChanged;
 
-    public class OnSelectedCounterChangedEventArgs :EventArgs
+    public class OnSelectedCounterChangedEventArgs : EventArgs
     {
-        public ClearCounter selectedCounter;
+        public BaseCounter selectedCounter;
     }
 
 
     [SerializeField] private bool _isWalking;
     [SerializeField] private float _moveSpeed = 7;
     [SerializeField] private LayerMask _countersLayerMask;
+    [SerializeField] private Transform _kitchenObjectHoldPoint;
 
-    private float playerRadius = 0.7f;
-    private float playerHeight = 2f;
-    private float moveDistance;
 
-    float rotationSpeed = 10f;
+    private float _playerRadius = 0.7f;
+    private float _playerHeight = 2f;
+    private float _moveDistance;
 
-    private float interactDistance = 2f;
-    private Vector3 lastInteractDir;
-    private ClearCounter selectedCounter;
+    private float _rotationSpeed = 10f;
+
+    private float _interactDistance = 2f;
+    private Vector3 _lastInteractDir;
+    private BaseCounter _selectedCounter;
+    private KitchenObject _kitchenObject;
+
+    protected override void LoadComponents()
+    {
+        base.LoadComponents();
+
+        if (this._kitchenObjectHoldPoint == null )
+        {
+            this._kitchenObjectHoldPoint = this.transform.Find("KitchenObjectHoldPoint");
+        }
+    }
 
     protected override void SetupValues()
     {
@@ -44,10 +57,9 @@ public class Player : Singleton<Player>
 
     private void Instance_OnInteractAction(object sender, System.EventArgs e)
     {
-        if (this.selectedCounter != null)
-
+        if (this._selectedCounter != null)
         {
-            this.selectedCounter.Interact();
+            this._selectedCounter.Interact(this);
         }
     }
 
@@ -64,13 +76,13 @@ public class Player : Singleton<Player>
         Vector2 inputVector = GameInput.Instance.GetMovementInputNormalize();
         Vector3 moveDir = new Vector3(inputVector.x, 0f, inputVector.y);
 
-        this.moveDistance = this._moveSpeed * Time.deltaTime;
-        bool canMove = !Physics.CapsuleCast(this.transform.position, this.transform.position + Vector3.up * this.playerHeight, this.playerRadius, moveDir, this.moveDistance);
+        this._moveDistance = this._moveSpeed * Time.deltaTime;
+        bool canMove = !Physics.CapsuleCast(this.transform.position, this.transform.position + Vector3.up * this._playerHeight, this._playerRadius, moveDir, this._moveDistance);
 
         if (!canMove)
         {
             Vector3 moveDirX = new Vector3(moveDir.x, 0, 0).normalized;
-            canMove = !Physics.CapsuleCast(this.transform.position, this.transform.position + Vector3.up * this.playerHeight, this.playerRadius, moveDirX, this.moveDistance);
+            canMove = !Physics.CapsuleCast(this.transform.position, this.transform.position + Vector3.up * this._playerHeight, this._playerRadius, moveDirX, this._moveDistance);
 
             if (canMove)
             {
@@ -79,7 +91,7 @@ public class Player : Singleton<Player>
             else
             {
                 Vector3 moveDirZ = new Vector3(0, 0, moveDir.z).normalized;
-                canMove = !Physics.CapsuleCast(this.transform.position, this.transform.position + Vector3.up * this.playerHeight, this.playerRadius, moveDirZ, this.moveDistance);
+                canMove = !Physics.CapsuleCast(this.transform.position, this.transform.position + Vector3.up * this._playerHeight, this._playerRadius, moveDirZ, this._moveDistance);
 
                 if (canMove)
                 {
@@ -95,7 +107,7 @@ public class Player : Singleton<Player>
 
         this._isWalking = moveDir != Vector3.zero;
 
-        this.transform.forward = Vector3.Slerp(this.transform.forward, moveDir, Time.deltaTime * this.rotationSpeed);
+        this.transform.forward = Vector3.Slerp(this.transform.forward, moveDir, Time.deltaTime * this._rotationSpeed);
     }
     
     private void HandleInteractions()
@@ -105,16 +117,16 @@ public class Player : Singleton<Player>
 
         if (moveDir != Vector3.zero)
         {
-            this.lastInteractDir = moveDir;
+            this._lastInteractDir = moveDir;
         }
 
-        if (Physics.Raycast(this.transform.position, this.lastInteractDir, out RaycastHit raycastHit, this.interactDistance, this._countersLayerMask))
+        if (Physics.Raycast(this.transform.position, this._lastInteractDir, out RaycastHit raycastHit, this._interactDistance, this._countersLayerMask))
         {
-            if (raycastHit.transform.TryGetComponent(out ClearCounter clearCounter))
+            if (raycastHit.transform.TryGetComponent(out BaseCounter baseCounter))
             {
-                if (this.selectedCounter != clearCounter)
+                if (this._selectedCounter != baseCounter)
                 {
-                    this.SetSelectedCounter(clearCounter);
+                    this.SetSelectedCounter(baseCounter);
                 }
             }
             else
@@ -137,15 +149,44 @@ public class Player : Singleton<Player>
         return this._isWalking;
     }
 
-    private void SetSelectedCounter(ClearCounter selectedCounter)
+    private void SetSelectedCounter(BaseCounter selectedCounter)
     {
-        this.selectedCounter = selectedCounter;
+        this._selectedCounter = selectedCounter;
 
         OnSelectedCounterChanged?.Invoke(this, new OnSelectedCounterChangedEventArgs
         {
-            selectedCounter = this.selectedCounter
+            selectedCounter = this._selectedCounter
         });
 
+    }
+
+    /*
+     * IKitchenObjectParent
+     */
+
+    public Transform GetkitchenObjectFollowTransform()
+    {
+        return this._kitchenObjectHoldPoint;
+    }
+
+    public void SetKitchenObject(KitchenObject kitchenObject)
+    {
+        this._kitchenObject = kitchenObject;
+    }
+
+    public KitchenObject GetKitchenObject()
+    {
+        return this._kitchenObject;
+    }
+
+    public void ClearKitchenObject()
+    {
+        this._kitchenObject = null;
+    }
+
+    public bool HasKitchenObject()
+    {
+        return this._kitchenObject != null;
     }
 
 }
