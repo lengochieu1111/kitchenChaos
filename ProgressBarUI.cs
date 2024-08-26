@@ -5,21 +5,25 @@ using UnityEngine.UI;
 
 public class ProgressBarUI : RyoMonoBehaviour
 {
-    [SerializeField] private CuttingCounter _cuttingCounter;
+    [SerializeField] private GameObject _hasProgressGameObject;
     [SerializeField] private Image _progressBarImage;
+
+    private IHasProgress _iHasProgress;
 
     protected override void Start()
     {
         base.Start();
 
-        this._cuttingCounter.OnProgressChanged += CuttingCounter_OnProgressChanged;
+        this._iHasProgress = this._hasProgressGameObject.GetComponent<IHasProgress>();
+
+        this._iHasProgress.OnProgressChanged += HasProgress_OnProgressChanged;
 
         this._progressBarImage.fillAmount = 0f;
 
         this.Hide();
     }
 
-    private void CuttingCounter_OnProgressChanged(object sender, CuttingCounter.OnProgressChangedEventArgs e)
+    private void HasProgress_OnProgressChanged(object sender, IHasProgress.OnProgressChangedEventArgs e)
     {
         this._progressBarImage.fillAmount = e.progressNormalized;
 
