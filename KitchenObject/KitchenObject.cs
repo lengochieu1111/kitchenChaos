@@ -21,10 +21,10 @@ public class KitchenObject : RyoMonoBehaviour
 
         this._kitchenObjectParent = kitchenObjectParent;
 
-        if (this._kitchenObjectParent.HasKitchenObject() )
-        {
-            Debug.Log("I Kitchen Object Parent has Kitchent Object");
-        }
+        //if (this._kitchenObjectParent.HasKitchenObject() )
+        //{
+        //    Debug.Log("I Kitchen Object Parent has Kitchent Object");
+        //}
 
         this._kitchenObjectParent.SetKitchenObject(this);
 
