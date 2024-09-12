@@ -8,6 +8,8 @@ public class DeliveryManager : Singleton<DeliveryManager>
 {
     public event EventHandler OnRecipeSpawned;
     public event EventHandler OnRecipeCompleted;
+    public event EventHandler OnRecipeSuccess;
+    public event EventHandler OnRecipeFailed;
 
     [SerializeField] private RecipeListSO _recipeListSO;
 
@@ -66,15 +68,14 @@ public class DeliveryManager : Singleton<DeliveryManager>
                 if (plateContentsMatchesRecipe)
                 {
                     this._waittingRecipeSOList.RemoveAt(i);
+                    OnRecipeSuccess?.Invoke(this, EventArgs.Empty);
                     OnRecipeCompleted?.Invoke(this, EventArgs.Empty);
-
-                    Debug.Log("Successs!");
                     return;
                 }
             }
         }
 
-        Debug.Log("Faill!");
+        OnRecipeFailed?.Invoke(this, EventArgs.Empty);
     }
 
     public List<RecipeSO> GetWaittingRecipeSOList()
