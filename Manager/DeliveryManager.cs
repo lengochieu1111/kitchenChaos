@@ -19,6 +19,8 @@ public class DeliveryManager : Singleton<DeliveryManager>
     private float _spawnRecipeTimerMax = 4f;
     private int _waittingRecipesMax = 4;
 
+    private int _successfulRecipesAmount;
+
     private void Update()
     {
         this._spawnRecipeTimer -= Time.deltaTime;
@@ -67,6 +69,7 @@ public class DeliveryManager : Singleton<DeliveryManager>
 
                 if (plateContentsMatchesRecipe)
                 {
+                    this._successfulRecipesAmount++;
                     this._waittingRecipeSOList.RemoveAt(i);
                     OnRecipeSuccess?.Invoke(this, EventArgs.Empty);
                     OnRecipeCompleted?.Invoke(this, EventArgs.Empty);
@@ -81,6 +84,11 @@ public class DeliveryManager : Singleton<DeliveryManager>
     public List<RecipeSO> GetWaittingRecipeSOList()
     {
         return this._waittingRecipeSOList;
+    }
+
+    public int GetSuccessfulRecipesAmount()
+    {
+        return this._successfulRecipesAmount;
     }
 
 }

@@ -61,6 +61,8 @@ public class Player : Singleton<Player>, IKitchenObjectParent
 
     private void Instance_OnInteractAction(object sender, System.EventArgs e)
     {
+        if (!KitchenGameManager.Instance.IsGamePlaying()) return;
+
         if (this._selectedCounter != null)
         {
             this._selectedCounter.Interact(this);
@@ -69,6 +71,8 @@ public class Player : Singleton<Player>, IKitchenObjectParent
 
     private void Instance_OnInteractAlternateAction(object sender, EventArgs e)
     {
+        if (!KitchenGameManager.Instance.IsGamePlaying()) return;
+
         if (this._selectedCounter != null)
         {
             this._selectedCounter.InteractAlternate(this);
