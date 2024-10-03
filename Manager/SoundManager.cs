@@ -5,7 +5,17 @@ using UnityEngine;
 
 public class SoundManager : Singleton<SoundManager>
 {
+    public const string PLAYER_PREFS_SOUND_EFFECTS_VOLUME = "SoundEffectsVolume";
+
     [SerializeField] private AudioClipRefsSO _audioClipRefsSO;
+    [SerializeField] private float _volume;
+
+    protected override void Awake()
+    {
+        base.Awake();
+
+        this._volume = PlayerPrefs.GetFloat(PLAYER_PREFS_SOUND_EFFECTS_VOLUME, 1f);
+    }
 
     protected override void Start()
     {
@@ -68,6 +78,24 @@ public class SoundManager : Singleton<SoundManager>
     public void PlayFootstepSound(Vector3 position, float volume = 1f)
     {
         this.PlaySound(this._audioClipRefsSO.footstep, position, volume);
+    }
+
+    public void ChangeVolume() 
+    { 
+        this._volume += 0.1f;
+
+        if (this._volume > 1f)
+        {
+            this._volume = 0f;
+        }
+
+        PlayerPrefs.SetFloat(PLAYER_PREFS_SOUND_EFFECTS_VOLUME, this._volume);
+        PlayerPrefs.Save();
+    }
+
+    public float GetVolume()
+    {
+        return this._volume;
     }
 
 }

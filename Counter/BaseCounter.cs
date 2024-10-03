@@ -7,6 +7,11 @@ public class BaseCounter : RyoMonoBehaviour, IKitchenObjectParent
 {
     public static event EventHandler OnAnyObjectPlaceHere;
 
+    new public static void ResetStaticData()
+    {
+        OnAnyObjectPlaceHere = null;
+    }
+
     [SerializeField] private Transform _counterTopPoint;
 
     private KitchenObject _kitchenObject;

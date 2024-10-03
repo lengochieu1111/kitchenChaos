@@ -34,8 +34,6 @@ public class DeliveryManager : Singleton<DeliveryManager>
                 this._waittingRecipeSOList.Add(waittingRecipeSO);
 
                 OnRecipeSpawned?.Invoke(this, EventArgs.Empty);
-
-                Debug.Log(waittingRecipeSO.recipeName);
             }
         }
     }

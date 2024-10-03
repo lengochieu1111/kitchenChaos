@@ -16,8 +16,6 @@ public class GameOverUI : RyoMonoBehaviour
         this.Hide();
     }
 
-
-
     private void KitchenGameManager_OnStateChanged(object sender, System.EventArgs e)
     {
         if (KitchenGameManager.Instance.IsGameOver())

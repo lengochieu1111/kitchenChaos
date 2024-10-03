@@ -8,6 +8,8 @@ public class KitchenGameManager : Singleton<KitchenGameManager>
 {
 
     public event EventHandler OnStateChanged;
+    public event EventHandler OnGamePaused;
+    public event EventHandler OnGameUnpaused;
 
     private enum State
     { 
@@ -21,6 +23,7 @@ public class KitchenGameManager : Singleton<KitchenGameManager>
     [SerializeField] private float _waitingToStartTimer = 1f;
     [SerializeField] private float _countdownToStartTimer = 3f;
     [SerializeField] private float _gamePlayingTimerMax = 10f;
+    [SerializeField] private bool _isGamePaused;
     private float _gamePlayingTimer;
 
     protected override void Start()
@@ -28,7 +31,12 @@ public class KitchenGameManager : Singleton<KitchenGameManager>
         base.Start();
 
         this._state = State.WaitingToStart;
+
+        GameInput.Instance.OnPauseAction += GameInput_OnPauseAction;
+
     }
+
+
 
     private void Update()
     {
@@ -68,6 +76,11 @@ public class KitchenGameManager : Singleton<KitchenGameManager>
 
     }
 
+    private void GameInput_OnPauseAction(object sender, EventArgs e)
+    {
+        this.TogglePausegame();
+    }
+
     public bool IsGamePlaying()
     {
         return this._state == State.GamePlaying;
@@ -88,10 +101,27 @@ public class KitchenGameManager : Singleton<KitchenGameManager>
         return this._state == State.GameOver;
     }
     
-    
     public float GetGamePlayingTimerNormalized()
     {
         return 1 - (this._gamePlayingTimer / this._gamePlayingTimerMax);
+    }
+
+    public void TogglePausegame()
+    {
+        this._isGamePaused = !this._isGamePaused;
+
+        if (this._isGamePaused)
+        {
+            Time.timeScale = 0f;
+
+            OnGamePaused?.Invoke(this, EventArgs.Empty);
+        }
+        else
+        {
+            Time.timeScale = 1f;
+
+            OnGameUnpaused?.Invoke(this, EventArgs.Empty);
+        }
     }
 
 }
